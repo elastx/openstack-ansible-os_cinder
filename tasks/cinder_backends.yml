@@ -47,6 +47,7 @@
     executable: /bin/bash
   with_dict: "{{ _cinder_backends|default({}) }}"
   changed_when: false
+  no_log: true
 
 - name: Add extra cinder volume types
   shell: |
@@ -61,6 +62,7 @@
     executable: /bin/bash
   with_dict: "{{ _cinder_backends|default({}) }}"
   when: item.value.extra_volume_types is defined
+  no_log: true
 
 - import_tasks: cinder_qos.yml
   when: cinder_qos_specs is defined
