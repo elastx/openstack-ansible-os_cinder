@@ -196,3 +196,14 @@ project_name = {{ cinder_service_project_name }}
 region_name = {{ keystone_service_region }}
 user_domain_id = {{ cinder_service_user_domain_id }}
 username = {{ cinder_service_user_name }}
+
+{% if cinder_keystone_audit_middlware_enabled %}
+# Remember to set api paste overrides to enable audit middleware
+[audit_middleware_notifications]
+driver = log
+audit_map_file = /etc/glance/api_audit_map.conf
+driver = messaging
+transport_url = {{ cinder_oslomsg_notify_transport }}://{% for host in cinder_oslomsg_notify_servers.split(',') %}{{ cinder_oslomsg_notify_userid }}:{{ cinder_oslomsg_notify_password }}@{{ host }}:{{ cinder_oslomsg_notify_port }}{% if not loop.last %},{% else %}/{{ cinder_oslomsg_notify_vhost }}{% if cinder_oslomsg_notify_use_ssl | bool %}?ssl=1&ssl_version={{ cinder_oslomsg_notify_ssl_version }}&ssl_ca_file={{ cinder_oslomsg_notify_ssl_ca_file }}{% else %}?ssl=0{% endif %}{% endif %}{% endfor %}
+# We only audit changes (CUD) and leave out reads
+ignore_req_list = GET
+{% endif %}

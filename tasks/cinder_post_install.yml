@@ -157,6 +157,14 @@
   tags:
     - cinder-nfs
 
+- name: Create cinder api audit map file
+  template:
+    src: api_audit_map.conf.j2
+    dest: /etc/cinder/api_audit_map.conf
+  when:
+    - "cinder_services['cinder-api']['group'] in group_names"
+    - cinder_keystone_audit_middlware_enabled | bool
+
 - name: Drop sudoers file
   template:
     src: "sudoers.j2"
